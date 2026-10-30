@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lộ trình Karnel Travel Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Be+Vietnam+Pro:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: lịch trình chuyến đi — mỗi giai đoạn là một chặng, mốc nộp bài là trạm dừng */
+:root{
+  --bg:#F2F5F7; --surface:#FFFFFF; --fg:#10222B; --muted:#5A6B74; --line:#D5DEE3;
+  --accent:#0B6E73; --accent-soft:#DDEFEF; --stop:#B87A0C; --stop-soft:#F7ECD6; --done:#2E7D4F;
+  --f-display:"Archivo","Segoe UI",system-ui,sans-serif;
+  --f-body:"Be Vietnam Pro","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0C161B; --surface:#13222A; --fg:#E5EDF0; --muted:#93A6AE; --line:#24363F;
+  --accent:#43B9B5; --accent-soft:#16363A; --stop:#E2A83C; --stop-soft:#3A2E16; --done:#5CC28A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C161B; --surface:#13222A; --fg:#E5EDF0; --muted:#93A6AE; --line:#24363F;
+  --accent:#43B9B5; --accent-soft:#16363A; --stop:#E2A83C; --stop-soft:#3A2E16; --done:#5CC28A; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(28px,5vw,42px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:22px;font-weight:800}
+h3{font-size:17px;font-weight:600}
+p{margin:0}
+.mono{font-family:var(--f-mono);font-size:12.5px;letter-spacing:.04em}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--muted)}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--accent-soft);padding:1px 6px;border-radius:4px}
+
+/* header */
+header{display:flex;flex-direction:column;gap:14px}
+.lede{max-width:65ch;color:var(--muted)}
+.controls{display:flex;flex-wrap:wrap;gap:16px;align-items:end;margin-top:8px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12px;font-family:var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.field input{font:inherit;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 10px;min-width:0}
+.field input:focus-visible,button:focus-visible,.task input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.progress{flex:1 1 220px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;width:0;background:var(--done);transition:width .3s}
+@media (prefers-reduced-motion:reduce){.bar>i{transition:none}}
+
+/* route timeline */
+.route{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.track-scroll{overflow-x:auto}
+.track{position:relative;min-width:560px;padding-top:30px;padding-bottom:34px}
+.legs{display:flex;height:34px;border-radius:6px;overflow:hidden}
+.leg{display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:12px;color:#fff;border-right:2px solid var(--surface);white-space:nowrap;overflow:hidden}
+.leg:last-child{border-right:0}
+.pin{position:absolute;top:0;bottom:0;width:0;border-left:2px dashed var(--stop)}
+.pin span{position:absolute;top:0;left:6px;font-family:var(--f-mono);font-size:11.5px;color:var(--stop);white-space:nowrap;background:var(--surface);padding:0 4px}
+.pin.end span{left:auto;right:6px}
+.ticks{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+
+/* stops (milestones) */
+.stops{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.stopcard{border:1px solid var(--line);border-left:4px solid var(--stop);background:var(--surface);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.stopcard .when{font-family:var(--f-mono);font-size:12.5px;color:var(--stop)}
+.stopcard p{font-size:13.5px;color:var(--muted)}
+
+/* phases */
+.phases{display:flex;flex-direction:column;gap:18px}
+.phase{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.phase-head{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:16px 18px;border-bottom:1px solid var(--line)}
+.num{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;color:#fff;font-size:16px}
+.phase-head .meta{display:flex;flex-direction:column;gap:2px;min-width:0}
+.phase-head .dates{font-family:var(--f-mono);font-size:12.5px;color:var(--muted);text-align:right;white-space:nowrap}
+.phase-head .count{font-family:var(--f-mono);font-size:12px;color:var(--done)}
+.phase-body{display:grid;grid-template-columns:1fr 260px;gap:0}
+.tasks{list-style:none;margin:0;padding:10px 18px 14px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.task{display:grid;grid-template-columns:20px 1fr;gap:10px;align-items:start;padding:7px 0;border-bottom:1px dashed var(--line)}
+.task:last-child{border-bottom:0}
+.task input{width:17px;height:17px;margin:3px 0 0;accent-color:var(--done);cursor:pointer}
+.task label{cursor:pointer}
+.task.is-done label{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.tag{display:inline-block;font-family:var(--f-mono);font-size:11px;padding:0 6px;border-radius:4px;margin-left:6px;vertical-align:1px;background:var(--accent-soft);color:var(--accent)}
+.tag.opt{background:var(--stop-soft);color:var(--stop)}
+.out{background:var(--bg);padding:14px 18px;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:8px;min-width:0}
+.out h4{margin:0;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.out ul{margin:0;padding-left:18px;font-size:13.5px;display:flex;flex-direction:column;gap:3px}
+@media (max-width:720px){.phase-body{grid-template-columns:1fr}.out{border-left:0;border-top:1px solid var(--line)}
+  .phase-head{grid-template-columns:auto 1fr}.phase-head .dates{grid-column:1/-1;text-align:left}}
+
+/* reference sections */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:760px){.two{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.sitemap{font-family:var(--f-mono);font-size:13px;line-height:1.85;margin:0;white-space:pre;overflow-x:auto}
+.stack{display:flex;flex-direction:column;gap:10px}
+.stack-row{display:grid;grid-template-columns:110px 1fr;gap:10px;font-size:14px}
+.stack-row b{font-family:var(--f-mono);font-size:12px;font-weight:500;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding-top:2px}
+.erd-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+.zip{font-family:var(--f-mono);font-size:13px;line-height:1.8;margin:0;white-space:pre;overflow-x:auto;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:14px}
+.warn{border:1px solid var(--stop);background:var(--stop-soft);border-radius:8px;padding:12px 14px;font-size:14px}
+button.reset{font:inherit;font-size:13px;background:none;border:1px solid var(--line);color:var(--muted);border-radius:6px;padding:7px 12px;cursor:pointer}
+button.reset:hover{color:var(--fg);border-color:var(--muted)}
+</style>
+
+<div class="wrap">
+<header>
+  <span class="eyebrow">Aptech eProject · Karneltravelguide.com</span>
+  <h1>Lộ trình hoàn thành Karnel Travel Guide</h1>
+  <p class="lede">Gồm 6 giai đoạn, đi từ đọc đề đến nộp file ZIP. Nhập ngày bắt đầu và thời lượng dự án, trang sẽ tự tính ngày cho từng giai đoạn và hai mốc gửi status mail theo đúng quy định trong đề. Bạn đánh dấu tick ở đâu thì trang lưu lại trên trình duyệt của bạn.</p>
+  <div class="controls">
+    <div class="field"><label for="start">Ngày bắt đầu</label><input type="date" id="start"></div>
+    <div class="field"><label for="days">Số ngày</label><input type="number" id="days" min="10" max="90" value="30" style="width:90px"></div>
+    <div class="progress">
+      <span class="mono muted" id="progLabel">0 / 0 việc đã xong</span>
+      <div class="bar"><i id="progBar"></i></div>
+    </div>
+    <button class="reset" id="reset" type="button">Bỏ hết dấu tick</button>
+  </div>
+</header>
+
+<section class="route" aria-label="Dòng thời gian">
+  <h2>Hành trình</h2>
+  <div class="track-scroll"><div class="track" id="track"></div></div>
+  <div class="stops" id="stops"></div>
+</section>
+
+<section class="phases" id="phases" aria-label="Các giai đoạn"></section>
+
+<section class="two">
+  <div class="panel">
+    <h2>Sơ đồ trang (sitemap)</h2>
+    <pre class="sitemap">/                     Home Page
+/about                About Us
+/search               Search Page
+  └ /search/advanced  Advanced Search
+/info                 Information Page
+  ├ /info/spots       Tourist Spots
+  ├ /info/travel      Travel Information
+  ├ /info/hotels      Hotel Information
+  ├ /info/restaurants Restaurant Information
+  └ /info/resorts     Resorts Information
+/contact              Contact Us (đặt dịch vụ + Feedback)
+/admin                Quản trị dữ liệu (khuyến nghị)</pre>
+  </div>
+  <div class="panel">
+    <h2>Công nghệ đề xuất</h2>
+    <p class="muted" style="font-size:14px">Đề chỉ cho dùng một số công nghệ nhất định, ví dụ .NET, JSP/Servlets, SQL Server. Phương án dưới đây vẫn nằm trong danh sách đó, chỉ là bản mới hơn.</p>
+    <div class="stack">
+      <div class="stack-row"><b>Backend</b><span>ASP.NET Core MVC (C#). Nếu nhóm học Java thì dùng JSP + Servlets + JDBC.</span></div>
+      <div class="stack-row"><b>CSDL</b><span>SQL Server, viết script <code>CREATE</code> + <code>INSERT</code> dữ liệu mẫu</span></div>
+      <div class="stack-row"><b>Frontend</b><span>HTML, CSS, JavaScript, Bootstrap 5 (responsive)</span></div>
+      <div class="stack-row"><b>Công cụ</b><span>Visual Studio / VS Code, SSMS, Git, draw.io (vẽ ERD)</span></div>
+      <div class="stack-row"><b>Chạy local</b><span>Gắn tên miền <code>www.karneltravelguide.com</code> vào file <code>hosts</code> để đúng yêu cầu URL</span></div>
+    </div>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:12px">
+  <h2>Thiết kế CSDL gợi ý (ERD)</h2>
+  <p class="muted" style="max-width:65ch">Hầu hết các bảng đều gắn với <b>Location</b>, nhờ vậy trang Search lọc được theo địa điểm, giá, chất lượng (sao) và tình trạng còn chỗ như đề yêu cầu.</p>
+  <div class="erd-scroll">
+<pre class="mermaid">
+erDiagram
+  LOCATION ||--o{ TOURIST_SPOT : has
+  LOCATION ||--o{ HOTEL : has
+  LOCATION ||--o{ RESTAURANT : has
+  LOCATION ||--o{ RESORT : has
+  LOCATION ||--o{ TRANSPORT : "from/to"
+  PACKAGE }o--o{ TOURIST_SPOT : includes
+  CUSTOMER ||--o{ BOOKING : places
+  BOOKING }o--|| PACKAGE : "for (optional)"
+  CUSTOMER ||--o{ FEEDBACK : writes
+  LOCATION { int Id PK
+    string City
+    string Region }
+  TOURIST_SPOT { int Id PK
+    int LocationId FK
+    string Name
+    string Category "beach/monument..."
+    string Description
+    string ImageUrl }
+  HOTEL { int Id PK
+    int LocationId FK
+    string Name
+    int Stars
+    decimal PricePerNight
+    int RoomsAvailable
+    bool IsNew }
+  RESTAURANT { int Id PK
+    int LocationId FK
+    string Name
+    string Cuisine
+    int PriceLevel
+    float Rating }
+  RESORT { int Id PK
+    int LocationId FK
+    string Name
+    int Stars
+    decimal Price
+    int Available }
+  TRANSPORT { int Id PK
+    int FromLocationId FK
+    int ToLocationId FK
+    string Type "bus/train/car..."
+    decimal Fare
+    string Schedule }
+  PACKAGE { int Id PK
+    string Title
+    decimal Price
+    int DiscountPercent
+    date ValidUntil }
+  CUSTOMER { int Id PK
+    string FullName
+    string Email
+    string Phone }
+  BOOKING { int Id PK
+    int CustomerId FK
+    string ServiceType
+    int ServiceId
+    date TravelDate
+    int People
+    string Status }
+  FEEDBACK { int Id PK
+    int CustomerId FK
+    int Rating
+    string Message
+    datetime CreatedAt }
+</pre>
+  </div>
+</section>
+
+<section class="two">
+  <div class="panel">
+    <h2>Cấu trúc file ZIP nộp cuối</h2>
+    <pre class="zip">Batch_Group_KarnelTravelGuide.zip
+├─ SourceCode/
+├─ Database/
+│  ├─ KarnelTravel.bak
+│  └─ script.sql
+├─ Documentation/
+│  ├─ ProjectReport.pdf
+│  └─ LoginCredentials.txt
+├─ Screenshots/
+└─ FeedbackForm.doc</pre>
+  </div>
+  <div class="panel">
+    <h2>Quy tắc cần nhớ</h2>
+    <div class="warn"><b>Mỗi nhóm chỉ được nộp một lần.</b> Đã nộp rồi thì không được thêm hay sửa file. Hãy dò hết checklist ở giai đoạn 6 trước khi bấm nộp.</div>
+    <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px">
+      <li>Tiêu đề email bắt đầu bằng <code>STATUS:</code>, <code>DOUBT:</code> hoặc <code>PROJECT SUBMISSION:</code>.</li>
+      <li>Status mail gửi kèm ZIP gồm code, script CSDL và ảnh chụp màn hình, qua mục Query/Status.</li>
+      <li>Code phải có comment, giải thích được logic.</li>
+      <li>Backup dữ liệu mỗi ngày, đẩy code lên Git sau mỗi buổi làm.</li>
+    </ul>
+  </div>
+</section>
+</div>
+
+<script>
+const PHASES=[
+ {name:"Phân tích & lập kế hoạch",share:.10,color:"#0B6E73",tasks:[
+  ["Cả nhóm đọc đề, gạch ra từng yêu cầu (URL, menu, 5 trang Information, Search, Contact)"],
+  ["Viết Problem Definition và Customer Requirement Specification"],
+  ["Chọn công nghệ, tạo repo Git, thống nhất cách đặt tên và cấu trúc thư mục"],
+  ["Lập Project Plan và Task Sheet: chia việc, giao người phụ trách, đặt hạn cho từng việc"]],
+  out:["Problem Definition","Customer Requirement Spec","Project Plan","Task Sheet"]},
+ {name:"Thiết kế",share:.15,color:"#2F7FA8",tasks:[
+  ["Vẽ ERD và chuẩn hóa bảng (theo sơ đồ gợi ý bên dưới)"],
+  ["Viết script SQL tạo bảng và dữ liệu mẫu: khoảng 10 điểm du lịch, mỗi loại khách sạn/nhà hàng/resort ít nhất 8 mục"],
+  ["Chốt sitemap, menu và wireframe cho từng trang"],
+  ["Viết GUI Standards: màu, font, nút, form, cách báo lỗi"],
+  ["Viết Interface Design Document và thuật toán (Algorithms) cho tìm kiếm, đặt dịch vụ"]],
+  out:["E-R Diagram","Script CSDL","GUI Standards","Interface Design","Algorithms"]},
+ {name:"Code giai đoạn 1: khung & thông tin",share:.28,color:"#5B6FBF",tasks:[
+  ["Khởi tạo project, kết nối CSDL, làm layout chung (header, menu, footer)"],
+  ["Home Page: banner, điểm đến nổi bật, gói tour đang khuyến mãi"],
+  ["About Us: giới thiệu công ty, các dịch vụ di chuyển, tour trọn gói, chỗ ở"],
+  ["Information Page cùng 5 trang con: Tourist Spots, Travel, Hotels, Restaurants, Resorts"],
+  ["Trên Information Page hiển thị khách sạn/nhà hàng/resort mới và khuyến mãi"],
+  ["Cấu hình file hosts để chạy được tại www.karneltravelguide.com"]],
+  out:["Status mail #1: code + script + ảnh chụp màn hình"]},
+ {name:"Code giai đoạn 2: tìm kiếm & liên hệ",share:.22,color:"#8A5BB0",tasks:[
+  ["Search: tìm điểm du lịch theo loại (biển, di tích…)"],
+  ["Search: tìm khách sạn/nhà hàng/resort theo địa điểm, giá, chất lượng, số lượng, tình trạng còn chỗ"],
+  ["Advanced Search: kết hợp nhiều tiêu chí, sắp xếp kết quả, phân trang"],
+  ["Contact Us: form đặt dịch vụ (lưu vào bảng Booking) có kiểm tra dữ liệu nhập"],
+  ["Form Feedback lưu vào CSDL"],
+  ["Trang Admin để thêm/sửa/xóa dữ liệu, có đăng nhập",true]],
+  out:["Website đủ chức năng","Tài khoản admin để ghi vào tài liệu"]},
+ {name:"Kiểm thử & hoàn thiện",share:.13,color:"#B5603A",tasks:[
+  ["Lập Unit Testing Check List và test từng trang, từng form"],
+  ["Test các trường hợp biên: ô tìm kiếm để trống, nhập sai định dạng, không có kết quả"],
+  ["Kiểm tra giao diện trên điện thoại và nhiều trình duyệt"],
+  ["Sửa lỗi, rà lại comment trong code"],
+  ["Viết Project Review and Monitoring Report"]],
+  out:["Status mail #2","Unit Testing Check List","Review & Monitoring Report"]},
+ {name:"Tài liệu & nộp bài",share:.12,color:"#2E7D4F",tasks:[
+  ["Ghép Project Report theo đúng thứ tự: Certificate, Mục lục, Problem Definition, CRS, Plan, ERD, Algorithms, GUI Standards, Interface Design, Task Sheet, Review Report, Unit Test, Final Check List"],
+  ["Ghi thông tin đăng nhập (admin, tài khoản CSDL) và hướng dẫn cài đặt, chạy project"],
+  ["Backup CSDL ra file .bak và xuất lại script .sql"],
+  ["Điền Feedback Form của eProjects"],
+  ["Nén ZIP, đặt tên theo Batch_Group_TênDựÁn. Giải nén thử trên máy khác và chạy lại"],
+  ["Gửi bài với tiêu đề PROJECT SUBMISSION: (chỉ nộp một lần)"]],
+  out:["Final Check List","File ZIP hoàn chỉnh"]}
+];
+
+const $=s=>document.querySelector(s);
+const KEY="karnel-workflow-v1";
+let state={};
+try{state=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){state={}}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}};
+
+const pad=n=>String(n).padStart(2,"0");
+const fmt=d=>pad(d.getDate())+"/"+pad(d.getMonth()+1);
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+
+const startIn=$("#start"),daysIn=$("#days");
+const today=new Date();today.setHours(0,0,0,0);
+startIn.value=state._start||iso(today);
+daysIn.value=state._days||30;
+
+function plan(){
+  const start=new Date(startIn.value+"T00:00:00");
+  let total=Math.max(10,Math.min(90,parseInt(daysIn.value)||30));
+  // chia ngày theo tỉ lệ, đảm bảo mỗi giai đoạn ít nhất 1 ngày
+  let acc=0;const ranges=PHASES.map((p,i)=>{
+    const from=Math.round(acc*total);acc+=p.share;
+    const to=i===PHASES.length-1?total:Math.round(acc*total);
+    return {from,to:Math.max(to,from+1)};
+  });
+  // mốc status mail theo đề
+  let m1,m2,rule;
+  if(total<30){m1=9;m2=total-3;rule="Dự án dưới 30 ngày: mail #1 trong khoảng ngày 7–10, mail #2 trước hạn chót 3 ngày."}
+  else{m1=10;m2=20;rule="Cứ 10 ngày một lần tính từ ngày bắt đầu."}
+  return {start,total,ranges,m1,m2,rule};
+}
+
+function render(){
+  const P=plan();
+  // track
+  const legs=PHASES.map((p,i)=>{const r=P.ranges[i];const w=(r.to-r.from)/P.total*100;
+    return `<div class="leg" style="width:${w}%;background:${p.color}" title="${p.name}">${i+1}</div>`}).join("");
+  const pin=(day,label,end)=>`<div class="pin${end?" end":""}" style="left:${day/P.total*100}%"><span>${label}</span></div>`;
+  $("#track").innerHTML=`<div class="legs">${legs}</div>`+
+    pin(P.m1,"STATUS #1 · ngày "+P.m1)+pin(P.m2,"STATUS #2 · ngày "+P.m2,P.m2/P.total>.75)+
+    `<div class="ticks"><span>${fmt(P.start)}</span><span>ngày ${Math.round(P.total/2)}</span><span>${fmt(addDays(P.start,P.total))} · nộp</span></div>`;
+  $("#stops").innerHTML=[
+    ["Status mail #1",P.m1,"Tiêu đề STATUS:. Báo tiến độ chung, việc đã xong, khó khăn đang gặp. Gửi kèm ZIP code, script CSDL và ảnh chụp màn hình."],
+    ["Status mail #2",P.m2,"Như mail #1 nhưng cập nhật thêm phần Search, Contact và kết quả test. "+P.rule],
+    ["Nộp bài cuối",P.total,"Tiêu đề PROJECT SUBMISSION:. Gửi một file ZIP đầy đủ kèm Feedback Form. Chỉ được nộp một lần."]
+  ].map(([t,d,txt])=>`<div class="stopcard"><span class="when">Ngày ${d} · ${fmt(addDays(P.start,d))}</span><h3>${t}</h3><p>${txt}</p></div>`).join("");
+
+  // phases
+  let doneAll=0,totAll=0;
+  $("#phases").innerHTML=PHASES.map((p,i)=>{
+    const r=P.ranges[i];let done=0;
+    const items=p.tasks.map((t,j)=>{const id=`t${i}_${j}`;const c=!!state[id];if(c)done++;
+      return `<li class="task${c?" is-done":""}"><input type="checkbox" id="${id}" ${c?"checked":""}><label for="${id}">${t[0]}${t[1]?'<span class="tag opt">khuyến nghị</span>':""}</label></li>`}).join("");
+    doneAll+=done;totAll+=p.tasks.length;
+    return `<article class="phase">
+      <div class="phase-head"><div class="num" style="background:${p.color}">${i+1}</div>
+        <div class="meta"><h3>${p.name}</h3><span class="count">${done}/${p.tasks.length} xong</span></div>
+        <div class="dates">ngày ${r.from+1}–${r.to}<br>${fmt(addDays(P.start,r.from))} → ${fmt(addDays(P.start,r.to-1))}</div></div>
+      <div class="phase-body"><ul class="tasks">${items}</ul>
+        <div class="out"><h4>Đầu ra</h4><ul>${p.out.map(o=>`<li>${o}</li>`).join("")}</ul></div></div>
+    </article>`}).join("");
+  $("#progLabel").textContent=`${doneAll} / ${totAll} việc đã xong`;
+  $("#progBar").style.width=(totAll?doneAll/totAll*100:0)+"%";
+}
+
+document.addEventListener("change",e=>{
+  if(e.target.matches(".task input")){state[e.target.id]=e.target.checked;save();render();
+    const el=document.getElementById(e.target.id);el&&el.focus();}
+  if(e.target===startIn||e.target===daysIn){state._start=startIn.value;state._days=daysIn.value;save();render()}
+});
+daysIn.addEventListener("input",()=>{if(parseInt(daysIn.value)>=10)render()});
+$("#reset").addEventListener("click",()=>{Object.keys(state).forEach(k=>{if(k[0]==="t")delete state[k]});save();render()});
+render();
+</script>
+
+</html>

@@ -1,0 +1,24 @@
+# Build output
+bin/
+obj/
+publish/
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+*.user
+*.suo
+*.rsuser
+.vscode/*
+!.vscode/extensions.json
+
+# Local settings and secrets
+appsettings.Development.local.json
+*.local.json
+
+# Database backups are large; keep them out of Git and put them in the final ZIP only
+*.bak
+
+# OS
+Thumbs.db
+.DS_Store
