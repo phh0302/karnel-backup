@@ -8,6 +8,7 @@ namespace KarnelTravelGuide.Areas.Admin.Controllers;
 // One small controller per table. The shared logic lives in CrudController<T>.
 
 /// <summary>/Admin/TouristSpots</summary>
+[Microsoft.AspNetCore.Mvc.Area("Admin")]
 public class TouristSpotsController : CrudController<TouristSpot>
 {
     public TouristSpotsController(KarnelDbContext db) : base(db) { }
@@ -24,6 +25,7 @@ public class TouristSpotsController : CrudController<TouristSpot>
 }
 
 /// <summary>/Admin/Hotels</summary>
+[Microsoft.AspNetCore.Mvc.Area("Admin")]
 public class HotelsController : CrudController<Hotel>
 {
     public HotelsController(KarnelDbContext db) : base(db) { }
@@ -40,6 +42,7 @@ public class HotelsController : CrudController<Hotel>
 }
 
 /// <summary>/Admin/Restaurants</summary>
+[Microsoft.AspNetCore.Mvc.Area("Admin")]
 public class RestaurantsController : CrudController<Restaurant>
 {
     public RestaurantsController(KarnelDbContext db) : base(db) { }
@@ -56,6 +59,7 @@ public class RestaurantsController : CrudController<Restaurant>
 }
 
 /// <summary>/Admin/Resorts</summary>
+[Microsoft.AspNetCore.Mvc.Area("Admin")]
 public class ResortsController : CrudController<Resort>
 {
     public ResortsController(KarnelDbContext db) : base(db) { }
@@ -72,6 +76,7 @@ public class ResortsController : CrudController<Resort>
 }
 
 /// <summary>/Admin/Transports</summary>
+[Microsoft.AspNetCore.Mvc.Area("Admin")]
 public class TransportsController : CrudController<Transport>
 {
     public TransportsController(KarnelDbContext db) : base(db) { }
@@ -91,6 +96,7 @@ public class TransportsController : CrudController<Transport>
 }
 
 /// <summary>/Admin/Packages</summary>
+[Microsoft.AspNetCore.Mvc.Area("Admin")]
 public class PackagesController : CrudController<Package>
 {
     public PackagesController(KarnelDbContext db) : base(db) { }
