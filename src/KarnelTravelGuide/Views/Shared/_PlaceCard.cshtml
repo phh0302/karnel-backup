@@ -1,0 +1,36 @@
+@model PlaceCard
+@* One card in a grid: photo with optional badge, title, subtitle, stars, price (GUI Standards 4) *@
+<article class="kt-card">
+    <div class="kt-card-img">
+        <img class="kt-img" src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/placeholder.svg" : Model.ImageUrl)"
+             alt="@Model.Title" loading="lazy" />
+        @if (!string.IsNullOrEmpty(Model.Badge))
+        {
+            <span class="kt-badge">@Model.Badge</span>
+        }
+    </div>
+    <div class="kt-card-body">
+        <h3 class="kt-card-title"><a href="@Model.Url">@Model.Title</a></h3>
+        <div class="kt-card-sub">@Model.Subtitle</div>
+        @if (Model.Stars > 0)
+        {
+            <div class="kt-stars" aria-label="@Model.Stars stars">@Money.Stars(Model.Stars)</div>
+        }
+        <div class="kt-card-foot">
+            @if (!string.IsNullOrEmpty(Model.PriceText))
+            {
+                <span>
+                    @if (!string.IsNullOrEmpty(Model.OldPriceText))
+                    {
+                        <span class="kt-old-price">@Model.OldPriceText</span>
+                    }
+                    <span class="kt-price">@Model.PriceText</span>
+                </span>
+            }
+            @if (!string.IsNullOrEmpty(Model.Extra))
+            {
+                <span class="kt-card-extra">@Model.Extra</span>
+            }
+        </div>
+    </div>
+</article>
