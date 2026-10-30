@@ -1,0 +1,18 @@
+@model BookingsViewModel
+@{
+    ViewData["Title"] = "Bookings";
+    int Count(string s) => Model.Counts.TryGetValue(s, out var n) ? n : 0;
+}
+<h1 class="h3">Bookings</h1>
+<p class="kt-muted">Call the customer, then mark the booking Contacted; this holds the rooms, seats or villas. Cancelling a contacted booking gives them back.</p>
+
+@* Status filter *@
+<ul class="nav nav-pills mb-3">
+    <li class="nav-item"><a class="nav-link @(Model.Status == null ? "active" : "")" asp-action="Index">All</a></li>
+    @foreach (var s in Booking.Statuses)
+    {
+        <li class="nav-item"><a class="nav-link @(Model.Status == s ? "active" : "")" asp-action="Index" asp-route-status="@s">@s (@Count(s))</a></li>
+    }
+</ul>
+
+<partial name="_BookingTable" model="Model.Rows" />

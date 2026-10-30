@@ -1,0 +1,65 @@
+@model TouristSpot
+@{
+    // Add / edit form for one tourist spot (CRS FR-61). ViewBag.IsNew decides the title and the action.
+    bool isNew = ViewBag.IsNew == true;
+    ViewData["Title"] = (isNew ? "Add " : "Edit ") + "tourist spot";
+}
+<h1 class="h3">@ViewData["Title"]</h1>
+<form asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@(isNew ? "" : Model.SpotId.ToString())" method="post" class="kt-panel mt-3">
+    <input type="hidden" asp-for="SpotId" />
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+    <div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="Name" class="form-label kt-req"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="LocationId" class="form-label kt-req"></label>
+        <select asp-for="LocationId" asp-items="ViewBag.Locations" class="form-select">
+            <option value="0">Choose a city…</option>
+        </select>
+        <span asp-validation-for="LocationId" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Category" class="form-label kt-req"></label>
+        <select asp-for="Category" asp-items="@(new SelectList(TouristSpot.Categories))" class="form-select">
+            <option value="">Choose…</option>
+        </select>
+        <span asp-validation-for="Category" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="EntryFee" class="form-label kt-req"></label>
+        <input asp-for="EntryFee" type="number" class="form-control" step="1000" />
+        <span asp-validation-for="EntryFee" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="BestTime" class="form-label"></label>
+        <input asp-for="BestTime" class="form-control" placeholder="Oct - Apr" />
+        <span asp-validation-for="BestTime" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Address" class="form-label"></label>
+        <input asp-for="Address" class="form-control" />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="ImageUrl" class="form-label"></label>
+        <input asp-for="ImageUrl" class="form-control" placeholder="/images/spots/name.jpg" />
+        <span asp-validation-for="ImageUrl" class="text-danger"></span>
+    </div>
+    <div class="col-md-6 d-flex align-items-end">
+        <div class="form-check mb-2">
+            <input asp-for="IsFeatured" class="form-check-input" />
+            <label asp-for="IsFeatured" class="form-check-label"></label>
+        </div>
+    </div>
+    <div class="col-12">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" rows="3" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    </div>
+    <partial name="_FormButtons" />
+</form>
+@section Scripts { <partial name="/Views/Shared/_ValidationScripts.cshtml" /> }

@@ -1,0 +1,23 @@
+@model List<Hotel>
+@{
+    ViewData["Title"] = "Hotels";
+}
+<partial name="_ListHead" model="@("Hotels")" />
+<p class="kt-muted">@Model.Count rows.</p>
+<div class="kt-table-wrap">
+    <table class="table table-striped kt-table">
+        <thead><tr><th>Name</th><th>City</th><th>Stars</th><th class="kt-num">Price / night</th><th class="kt-num">Rooms left</th><th>New</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var x in Model)
+            {
+                <tr>
+                    <td>@x.Name</td><td>@x.Location?.City</td><td class="kt-stars">@Money.Stars(x.Stars)</td><td class="kt-num">@Money.Vnd(x.PricePerNight)</td><td class="kt-num">@x.RoomsAvailable / @x.TotalRooms</td><td>@(x.IsNew ? "New" : "")</td>
+                    <td class="text-nowrap text-end">
+                        <a asp-action="Edit" asp-route-id="@x.HotelId" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@x.HotelId" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

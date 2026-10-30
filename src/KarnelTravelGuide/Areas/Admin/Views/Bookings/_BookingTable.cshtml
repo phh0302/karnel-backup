@@ -1,0 +1,52 @@
+@model List<BookingRow>
+@* Booking table with status buttons; used by the Bookings page and the dashboard *@
+@if (!Model.Any())
+{
+    <div class="kt-empty">No bookings here.</div>
+}
+else
+{
+    <div class="kt-table-wrap">
+        <table class="table kt-table">
+            <thead>
+                <tr><th>#</th><th>Received</th><th>Customer</th><th>Service</th><th>Travel date</th><th class="kt-num">People</th><th class="kt-num">Qty</th><th>Status</th><th>Change status</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model)
+                {
+                    var b = row.Booking;
+                    <tr>
+                        <td>@b.BookingId</td>
+                        <td class="text-nowrap">@b.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            @b.Customer?.FullName
+                            <div class="small kt-muted">@b.Customer?.Phone · @b.Customer?.Email</div>
+                        </td>
+                        <td>
+                            <span class="kt-pill">@b.ServiceType</span> @row.ServiceName
+                            @if (!string.IsNullOrEmpty(b.Note))
+                            {
+                                <div class="small kt-muted">“@b.Note”</div>
+                            }
+                        </td>
+                        <td class="text-nowrap">@b.TravelDate.ToString("dd/MM/yyyy")</td>
+                        <td class="kt-num">@b.NumberOfPeople</td>
+                        <td class="kt-num">@b.Quantity</td>
+                        <td><span class="kt-pill kt-pill-@b.Status.ToLower()">@b.Status</span></td>
+                        <td class="text-nowrap">
+                            @foreach (var next in BookingsController.NextStatuses(b.Status))
+                            {
+                                <form asp-area="Admin" asp-controller="Bookings" asp-action="UpdateStatus" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@b.BookingId" />
+                                    <input type="hidden" name="newStatus" value="@next" />
+                                    <input type="hidden" name="returnStatus" value="@Context.Request.Query["status"]" />
+                                    <button type="submit" class="btn btn-sm @(next == "Cancelled" ? "btn-outline-danger" : "btn-outline-primary")">@next</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

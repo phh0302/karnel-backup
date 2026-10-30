@@ -1,0 +1,25 @@
+@model LoginForm
+@{
+    // Login uses the public layout, not the admin side menu
+    Layout = "/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admin login";
+}
+<div class="container kt-section">
+    <div class="kt-panel mx-auto" style="max-width: 420px">
+        <h1 class="h3">Admin login</h1>
+        <p class="kt-muted">For Karnel Travels staff only.</p>
+        <form asp-area="Admin" asp-controller="Account" asp-action="Login" method="post">
+            <input type="hidden" asp-for="ReturnUrl" />
+            <div asp-validation-summary="All" class="text-danger mb-2"></div>
+            <div class="mb-3">
+                <label asp-for="Username" class="form-label"></label>
+                <input asp-for="Username" class="form-control" autocomplete="username" autofocus />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" autocomplete="current-password" />
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Log in</button>
+        </form>
+    </div>
+</div>

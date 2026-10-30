@@ -1,0 +1,13 @@
+@model DeleteViewModel
+@{
+    // Shared delete confirmation (GUI Standards: delete always asks on a separate page)
+    ViewData["Title"] = "Delete " + Model.Kind;
+}
+<h1 class="h3">Delete @Model.Kind?</h1>
+<div class="kt-panel mt-3" style="max-width: 560px">
+    <p>You are about to delete <strong>@Model.Name</strong>. This cannot be undone.</p>
+    <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-flex gap-2">
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+</div>

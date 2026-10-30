@@ -1,0 +1,23 @@
+@model List<TouristSpot>
+@{
+    ViewData["Title"] = "Tourist spots";
+}
+<partial name="_ListHead" model="@("Tourist spots")" />
+<p class="kt-muted">@Model.Count rows.</p>
+<div class="kt-table-wrap">
+    <table class="table table-striped kt-table">
+        <thead><tr><th>Name</th><th>City</th><th>Category</th><th class="kt-num">Entry fee</th><th>Featured</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var x in Model)
+            {
+                <tr>
+                    <td>@x.Name</td><td>@x.Location?.City</td><td>@x.Category</td><td class="kt-num">@Money.Vnd(x.EntryFee, true)</td><td>@(x.IsFeatured ? "Yes" : "")</td>
+                    <td class="text-nowrap text-end">
+                        <a asp-action="Edit" asp-route-id="@x.SpotId" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@x.SpotId" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

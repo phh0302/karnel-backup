@@ -1,0 +1,22 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+<h1 class="h3">Dashboard</h1>
+
+<div class="kt-stats mt-3">
+    <a class="kt-stat text-decoration-none" asp-controller="Bookings" asp-action="Index" asp-route-status="New"><b>@Model.NewBookings</b><span>new bookings to call back</span></a>
+    <a class="kt-stat text-decoration-none" asp-controller="Feedbacks" asp-action="Index"><b>@Model.UnreadFeedback</b><span>unread feedback</span></a>
+    <div class="kt-stat"><b>@Model.Spots</b><span>tourist spots</span></div>
+    <div class="kt-stat"><b>@Model.Hotels</b><span>hotels</span></div>
+    <div class="kt-stat"><b>@Model.Restaurants</b><span>restaurants</span></div>
+    <div class="kt-stat"><b>@Model.Resorts</b><span>resorts</span></div>
+    <div class="kt-stat"><b>@Model.Routes</b><span>routes</span></div>
+    <div class="kt-stat"><b>@Model.Packages</b><span>packages</span></div>
+</div>
+
+<div class="kt-section-head mt-5">
+    <h2 class="h4 mb-0">Latest bookings</h2>
+    <a asp-controller="Bookings" asp-action="Index">All bookings →</a>
+</div>
+<partial name="/Areas/Admin/Views/Bookings/_BookingTable.cshtml" model="Model.LatestBookings" />

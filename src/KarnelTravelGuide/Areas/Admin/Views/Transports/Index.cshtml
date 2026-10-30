@@ -1,0 +1,23 @@
+@model List<Transport>
+@{
+    ViewData["Title"] = "Transport routes";
+}
+<partial name="_ListHead" model="@("Transport routes")" />
+<p class="kt-muted">@Model.Count rows.</p>
+<div class="kt-table-wrap">
+    <table class="table table-striped kt-table">
+        <thead><tr><th>From</th><th>To</th><th>Type</th><th>Operator</th><th class="kt-num">Fare</th><th class="kt-num">Hours</th><th class="kt-num">Seats</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var x in Model)
+            {
+                <tr>
+                    <td>@x.FromLocation?.City</td><td>@x.ToLocation?.City</td><td>@x.TransportType</td><td>@x.Operator</td><td class="kt-num">@Money.Vnd(x.Fare)</td><td class="kt-num">@x.DurationHours</td><td class="kt-num">@x.SeatsAvailable</td>
+                    <td class="text-nowrap text-end">
+                        <a asp-action="Edit" asp-route-id="@x.TransportId" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@x.TransportId" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

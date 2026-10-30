@@ -1,0 +1,23 @@
+@model List<Package>
+@{
+    ViewData["Title"] = "Packages";
+}
+<partial name="_ListHead" model="@("Packages")" />
+<p class="kt-muted">@Model.Count rows.</p>
+<div class="kt-table-wrap">
+    <table class="table table-striped kt-table">
+        <thead><tr><th>Title</th><th>City</th><th>Days</th><th class="kt-num">Price</th><th class="kt-num">Discount</th><th class="kt-num">Final price</th><th>Valid until</th><th>Active</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var x in Model)
+            {
+                <tr>
+                    <td>@x.Title</td><td>@x.Location?.City</td><td>@x.DurationDays</td><td class="kt-num">@Money.Vnd(x.Price)</td><td class="kt-num">@x.DiscountPercent%</td><td class="kt-num">@Money.Vnd(x.FinalPrice)</td><td>@x.ValidUntil.ToString("dd/MM/yyyy")</td><td>@(x.IsActive ? "Yes" : "No")</td>
+                    <td class="text-nowrap text-end">
+                        <a asp-action="Edit" asp-route-id="@x.PackageId" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@x.PackageId" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

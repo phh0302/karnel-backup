@@ -1,0 +1,66 @@
+@model Transport
+@{
+    // Add / edit form for one route (CRS FR-61). ViewBag.IsNew decides the title and the action.
+    bool isNew = ViewBag.IsNew == true;
+    ViewData["Title"] = (isNew ? "Add " : "Edit ") + "route";
+}
+<h1 class="h3">@ViewData["Title"]</h1>
+<form asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@(isNew ? "" : Model.TransportId.ToString())" method="post" class="kt-panel mt-3">
+    <input type="hidden" asp-for="TransportId" />
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+    <div class="row g-3">
+    <div class="col-md-4">
+        <label asp-for="FromLocationId" class="form-label kt-req"></label>
+        <select asp-for="FromLocationId" asp-items="ViewBag.Locations" class="form-select">
+            <option value="0">Choose a city…</option>
+        </select>
+        <span asp-validation-for="FromLocationId" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="ToLocationId" class="form-label kt-req"></label>
+        <select asp-for="ToLocationId" asp-items="ViewBag.Locations" class="form-select">
+            <option value="0">Choose a city…</option>
+        </select>
+        <span asp-validation-for="ToLocationId" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="TransportType" class="form-label kt-req"></label>
+        <select asp-for="TransportType" asp-items="@(new SelectList(Transport.Types))" class="form-select">
+            <option value="">Choose…</option>
+        </select>
+        <span asp-validation-for="TransportType" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Operator" class="form-label kt-req"></label>
+        <input asp-for="Operator" class="form-control" placeholder="Karnel Travels Limousine" />
+        <span asp-validation-for="Operator" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Fare" class="form-label kt-req"></label>
+        <input asp-for="Fare" type="number" class="form-control" step="1000" />
+        <span asp-validation-for="Fare" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="DurationHours" class="form-label kt-req"></label>
+        <input asp-for="DurationHours" type="number" class="form-control" step="0.1" />
+        <span asp-validation-for="DurationHours" class="text-danger"></span>
+    </div>
+    <div class="col-md-8">
+        <label asp-for="DepartureTimes" class="form-label"></label>
+        <input asp-for="DepartureTimes" class="form-control" placeholder="06:00, 13:00, 21:00" />
+        <span asp-validation-for="DepartureTimes" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="SeatsAvailable" class="form-label kt-req"></label>
+        <input asp-for="SeatsAvailable" type="number" class="form-control" />
+        <span asp-validation-for="SeatsAvailable" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" rows="3" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    </div>
+    <partial name="_FormButtons" />
+</form>
+@section Scripts { <partial name="/Views/Shared/_ValidationScripts.cshtml" /> }

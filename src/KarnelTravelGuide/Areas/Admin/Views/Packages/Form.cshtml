@@ -1,0 +1,68 @@
+@model Package
+@{
+    // Add / edit form for one package (CRS FR-61). ViewBag.IsNew decides the title and the action.
+    bool isNew = ViewBag.IsNew == true;
+    ViewData["Title"] = (isNew ? "Add " : "Edit ") + "package";
+}
+<h1 class="h3">@ViewData["Title"]</h1>
+<form asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@(isNew ? "" : Model.PackageId.ToString())" method="post" class="kt-panel mt-3">
+    <input type="hidden" asp-for="PackageId" />
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+    <div class="row g-3">
+    <div class="col-md-8">
+        <label asp-for="Title" class="form-label kt-req"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="DurationDays" class="form-label kt-req"></label>
+        <input asp-for="DurationDays" type="number" class="form-control" />
+        <span asp-validation-for="DurationDays" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="LocationId" class="form-label kt-req"></label>
+        <select asp-for="LocationId" asp-items="ViewBag.Locations" class="form-select">
+            <option value="0">Choose a city…</option>
+        </select>
+        <span asp-validation-for="LocationId" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Price" class="form-label kt-req"></label>
+        <input asp-for="Price" type="number" class="form-control" step="10000" />
+        <span asp-validation-for="Price" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="DiscountPercent" class="form-label kt-req"></label>
+        <input asp-for="DiscountPercent" type="number" class="form-control" />
+        <span asp-validation-for="DiscountPercent" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="ValidFrom" class="form-label kt-req"></label>
+        <input asp-for="ValidFrom" type="date" class="form-control" />
+        <span asp-validation-for="ValidFrom" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="ValidUntil" class="form-label kt-req"></label>
+        <input asp-for="ValidUntil" type="date" class="form-control" />
+        <span asp-validation-for="ValidUntil" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="ImageUrl" class="form-label"></label>
+        <input asp-for="ImageUrl" class="form-control" placeholder="/images/packages/name.jpg" />
+        <span asp-validation-for="ImageUrl" class="text-danger"></span>
+    </div>
+    <div class="col-md-6 d-flex align-items-end">
+        <div class="form-check mb-2">
+            <input asp-for="IsActive" class="form-check-input" />
+            <label asp-for="IsActive" class="form-check-label"></label>
+        </div>
+    </div>
+    <div class="col-12">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" rows="3" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    </div>
+    <partial name="_FormButtons" />
+</form>
+@section Scripts { <partial name="/Views/Shared/_ValidationScripts.cshtml" /> }

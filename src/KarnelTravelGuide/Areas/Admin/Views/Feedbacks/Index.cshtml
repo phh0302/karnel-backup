@@ -1,0 +1,42 @@
+@model List<Feedback>
+@{
+    ViewData["Title"] = "Feedback";
+}
+<h1 class="h3">Feedback</h1>
+<p class="kt-muted">Unread feedback is listed first.</p>
+
+@if (!Model.Any())
+{
+    <div class="kt-empty">No feedback yet.</div>
+}
+else
+{
+    <div class="d-flex flex-column gap-3">
+        @foreach (var f in Model)
+        {
+            <article class="kt-panel @(f.IsRead ? "opacity-75" : "")">
+                <div class="d-flex justify-content-between flex-wrap gap-2">
+                    <div>
+                        <span class="kt-stars" aria-label="@f.Rating stars">@Money.Stars(f.Rating)</span>
+                        <strong class="ms-2">@(f.Subject ?? "(no subject)")</strong>
+                        @if (!f.IsRead)
+                        {
+                            <span class="kt-pill kt-pill-new ms-2">Unread</span>
+                        }
+                    </div>
+                    <span class="small kt-muted">@f.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                </div>
+                <p class="mt-2 mb-2">@f.Message</p>
+                <div class="d-flex justify-content-between flex-wrap gap-2 small">
+                    <span class="kt-muted">@f.Customer?.FullName · @f.Customer?.Email · @f.Customer?.Phone</span>
+                    @if (!f.IsRead)
+                    {
+                        <form asp-action="MarkRead" asp-route-id="@f.FeedbackId" method="post">
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Mark as read</button>
+                        </form>
+                    }
+                </div>
+            </article>
+        }
+    </div>
+}
