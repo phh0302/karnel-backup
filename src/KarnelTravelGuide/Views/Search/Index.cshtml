@@ -1,0 +1,131 @@
+@model SearchViewModel
+@{
+    // Search Page (CRS FR-30, FR-31, FR-32, FR-35)
+    ViewData["Title"] = "Search";
+    ViewData["Menu"] = "Search";
+    var c = Model.Criteria;
+    var tabs = new (string Key, string Label)[] { ("Spot", "Tourist spots"), ("Hotel", "Hotels"), ("Restaurant", "Restaurants"), ("Resort", "Resorts") };
+    bool isSpot = c.Type == "Spot";
+    // Labels change with the tab so the visitor knows what each box means
+    string priceLabel = c.Type switch { "Spot" => "Entry fee", "Restaurant" => "Price per person", _ => "Price per night" };
+    string qtyLabel = c.Type switch { "Restaurant" => "Seats needed", "Resort" => "Villas needed", _ => "Rooms needed" };
+}
+
+<div class="kt-page-head">
+    <div class="container">
+        <div class="kt-section-head mb-0">
+            <h1>Search</h1>
+            <a asp-action="Advanced">Advanced search →</a>
+        </div>
+        <p class="kt-muted mb-0">Find tourist spots, hotels, restaurants and resorts by location, price, quality, quantity and availability.</p>
+    </div>
+</div>
+
+<div class="container pt-4">
+    @* ===== Type tabs: switching keeps the chosen city ===== *@
+    <ul class="nav nav-pills mb-3" role="tablist">
+        @foreach (var t in tabs)
+        {
+            <li class="nav-item">
+                <a class="nav-link @(c.Type == t.Key ? "active" : "")" asp-action="Index"
+                   asp-route-type="@t.Key" asp-route-locationId="@c.LocationId">@t.Label</a>
+            </li>
+        }
+    </ul>
+
+    @* ===== Filter form (Algorithm A2 / A3) ===== *@
+    <form method="get" asp-action="Index" class="kt-panel">
+        <input type="hidden" name="type" value="@c.Type" />
+        <div class="row g-3 align-items-end">
+            <div class="col-sm-6 col-lg-3">
+                <label for="locationId" class="form-label">Location</label>
+                <select id="locationId" name="locationId" class="form-select">
+                    <option value="">All of Viet Nam</option>
+                    @foreach (var l in Model.Locations)
+                    {
+                        <option value="@l.LocationId" selected="@(c.LocationId == l.LocationId)">@l.City</option>
+                    }
+                </select>
+            </div>
+            <div class="col-6 col-lg-2">
+                <label for="minPrice" class="form-label">@priceLabel from (₫)</label>
+                <input id="minPrice" name="minPrice" type="number" min="0" step="10000" class="form-control" value="@c.MinPrice" placeholder="0" />
+            </div>
+            <div class="col-6 col-lg-2">
+                <label for="maxPrice" class="form-label">to (₫)</label>
+                <input id="maxPrice" name="maxPrice" type="number" min="0" step="10000" class="form-control" value="@c.MaxPrice" placeholder="any" />
+            </div>
+            @if (isSpot)
+            {
+                <div class="col-sm-6 col-lg-3">
+                    <label for="category" class="form-label">Type of place</label>
+                    <select id="category" name="category" class="form-select">
+                        <option value="">All types</option>
+                        @foreach (var cat in TouristSpot.Categories)
+                        {
+                            <option value="@cat" selected="@(c.Category == cat)">@cat</option>
+                        }
+                    </select>
+                </div>
+            }
+            else
+            {
+                <div class="col-6 col-lg-2">
+                    <label for="minQuality" class="form-label">Quality</label>
+                    <select id="minQuality" name="minQuality" class="form-select">
+                        <option value="">Any</option>
+                        @if (c.Type == "Restaurant")
+                        {
+                            foreach (var r in new[] { 3.0m, 3.5m, 4.0m, 4.5m })
+                            {
+                                <option value="@r.ToString("0.0")" selected="@(c.MinQuality == r)">Rated @r.ToString("0.0")+</option>
+                            }
+                        }
+                        else
+                        {
+                            for (int s = 2; s <= 5; s++)
+                            {
+                                <option value="@s" selected="@(c.MinQuality == s)">@s stars+</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-6 col-lg-1">
+                    <label for="quantity" class="form-label">@qtyLabel</label>
+                    <input id="quantity" name="quantity" type="number" min="1" max="50" class="form-control" value="@c.Quantity" />
+                </div>
+                <div class="col-sm-6 col-lg-2">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="onlyAvailable" name="onlyAvailable" value="true" checked="@c.OnlyAvailable" />
+                        <input type="hidden" name="onlyAvailable" value="false" />
+                        <label class="form-check-label" for="onlyAvailable">Only available</label>
+                    </div>
+                </div>
+            }
+            <div class="col-12 col-lg-auto ms-auto d-grid">
+                <button type="submit" class="btn btn-primary px-4">Search</button>
+            </div>
+        </div>
+    </form>
+
+    @* ===== Results ===== *@
+    <section class="pt-4">
+        <p class="kt-muted">@Model.Results.Count result@(Model.Results.Count == 1 ? "" : "s")</p>
+        @if (Model.Results.Any())
+        {
+            <div class="row g-4">
+                @foreach (var card in Model.Results)
+                {
+                    <div class="col-sm-6 col-lg-4 col-xl-3"><partial name="_PlaceCard" model="card" /></div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="kt-empty">
+                <span class="kt-empty-icon" aria-hidden="true">🔍</span>
+                Nothing matches. Try a wider price range, a lower quality, or another location.
+            </div>
+        }
+    </section>
+</div>

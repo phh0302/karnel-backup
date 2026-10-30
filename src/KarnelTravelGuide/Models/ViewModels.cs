@@ -91,3 +91,58 @@ public class DetailViewModel
     public string? BookServiceType { get; set; }           // null = nothing to book (tourist spot)
     public int BookServiceId { get; set; }
 }
+
+/// <summary>
+/// Search criteria shared by the Search and Advanced Search pages (Algorithms A2, A3, A4).
+/// Bound from the query string, so a search can be bookmarked or shared.
+/// </summary>
+public class SearchCriteria
+{
+    public string Type { get; set; } = "Hotel";            // Spot, Hotel, Restaurant, Resort
+    public int? LocationId { get; set; }
+    public decimal? MinPrice { get; set; }
+    public decimal? MaxPrice { get; set; }
+    public decimal? MinQuality { get; set; }              // stars for hotels/resorts, rating for restaurants
+    public int Quantity { get; set; } = 1;                // rooms, seats or villas needed
+    public bool OnlyAvailable { get; set; } = true;
+    public string? Category { get; set; }                 // tourist spot type
+    public string? Keyword { get; set; }
+
+    // Advanced search only
+    public List<string> Types { get; set; } = new();
+    public string SortBy { get; set; } = "price";         // price, quality, name
+    public string SortDir { get; set; } = "asc";          // asc, desc
+    public int Page { get; set; } = 1;
+}
+
+/// <summary>One result row for Advanced Search.</summary>
+public class SearchRow
+{
+    public string Type { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string City { get; set; } = "";
+    public decimal Price { get; set; }
+    public string PriceUnit { get; set; } = "";
+    public decimal Quality { get; set; }                  // for sorting
+    public string QualityText { get; set; } = "";
+    public string Url { get; set; } = "";
+}
+
+/// <summary>Search page: criteria, the list of cities, and result cards.</summary>
+public class SearchViewModel
+{
+    public SearchCriteria Criteria { get; set; } = new();
+    public List<Location> Locations { get; set; } = new();
+    public List<PlaceCard> Results { get; set; } = new();
+}
+
+/// <summary>Advanced Search page: criteria and one page of sorted results.</summary>
+public class AdvancedSearchViewModel
+{
+    public SearchCriteria Criteria { get; set; } = new();
+    public List<Location> Locations { get; set; } = new();
+    public List<SearchRow> Rows { get; set; } = new();
+    public int Total { get; set; }
+    public int TotalPages { get; set; }
+    public const int PageSize = 10;
+}

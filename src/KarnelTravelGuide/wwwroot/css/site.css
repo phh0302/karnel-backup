@@ -201,3 +201,9 @@ a.kt-tile:hover { border-color: var(--kt-primary); color: var(--kt-ink); }
     .kt-admin-side a.kt-side-link.active { border-bottom-color: var(--kt-accent); }
     .kt-admin-main { padding: 16px; }
 }
+
+/* ---- 17. Pagination in the site colours ---- */
+.pagination { --bs-pagination-color: var(--kt-primary); --bs-pagination-hover-color: var(--kt-primary-dark);
+    --bs-pagination-active-bg: var(--kt-primary); --bs-pagination-active-border-color: var(--kt-primary);
+    --bs-pagination-focus-box-shadow: 0 0 0 .2rem rgba(11,110,115,.25); flex-wrap: wrap; }
+.form-check-input:checked { background-color: var(--kt-primary); border-color: var(--kt-primary); }

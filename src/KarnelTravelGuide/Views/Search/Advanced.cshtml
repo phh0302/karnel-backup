@@ -1,0 +1,159 @@
+@model AdvancedSearchViewModel
+@{
+    // Advanced Search (CRS FR-33, FR-34): several types, keyword, sorting and pages
+    ViewData["Title"] = "Advanced search";
+    ViewData["Menu"] = "Search";
+    var c = Model.Criteria;
+    var types = new (string Key, string Label)[] { ("Spot", "Tourist spots"), ("Hotel", "Hotels"), ("Restaurant", "Restaurants"), ("Resort", "Resorts") };
+
+    // Builds the query string for a pager link, keeping every criterion
+    string PageUrl(int page)
+    {
+        var parts = new List<string>();
+        void Add(string k, object? v) { if (v != null && v.ToString() != "") parts.Add($"{k}={Uri.EscapeDataString(v.ToString()!)}"); }
+        Add("keyword", c.Keyword);
+        foreach (var t in c.Types) Add("types", t);
+        Add("locationId", c.LocationId);
+        Add("minPrice", c.MinPrice);
+        Add("maxPrice", c.MaxPrice);
+        Add("minQuality", c.MinQuality);
+        Add("quantity", c.Quantity);
+        Add("onlyAvailable", c.OnlyAvailable ? "true" : "false");
+        Add("sortBy", c.SortBy);
+        Add("sortDir", c.SortDir);
+        Add("page", page);
+        return "/Search/Advanced?" + string.Join("&", parts);
+    }
+}
+
+<div class="kt-page-head">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="Index">Search</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Advanced search</li>
+            </ol>
+        </nav>
+        <h1>Advanced search</h1>
+        <p class="kt-muted mb-0">Search several kinds of places at once, then sort the results.</p>
+    </div>
+</div>
+
+<div class="container pt-4">
+    <form method="get" asp-action="Advanced" class="kt-panel">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="keyword" class="form-label">Keyword</label>
+                <input id="keyword" name="keyword" class="form-control" value="@c.Keyword" placeholder="e.g. beach, seafood, Sofitel" />
+            </div>
+            <div class="col-md-6">
+                <span class="form-label d-block">Search in</span>
+                @foreach (var t in types)
+                {
+                    <div class="form-check form-check-inline mt-2">
+                        <input class="form-check-input" type="checkbox" name="types" id="type-@t.Key" value="@t.Key" checked="@c.Types.Contains(t.Key)" />
+                        <label class="form-check-label" for="type-@t.Key">@t.Label</label>
+                    </div>
+                }
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <label for="locationId" class="form-label">Location</label>
+                <select id="locationId" name="locationId" class="form-select">
+                    <option value="">All of Viet Nam</option>
+                    @foreach (var l in Model.Locations)
+                    {
+                        <option value="@l.LocationId" selected="@(c.LocationId == l.LocationId)">@l.City</option>
+                    }
+                </select>
+            </div>
+            <div class="col-6 col-lg-2">
+                <label for="minPrice" class="form-label">Price from (₫)</label>
+                <input id="minPrice" name="minPrice" type="number" min="0" step="10000" class="form-control" value="@c.MinPrice" />
+            </div>
+            <div class="col-6 col-lg-2">
+                <label for="maxPrice" class="form-label">to (₫)</label>
+                <input id="maxPrice" name="maxPrice" type="number" min="0" step="10000" class="form-control" value="@c.MaxPrice" />
+            </div>
+            <div class="col-6 col-lg-2">
+                <label for="minQuality" class="form-label">Min stars / rating</label>
+                <input id="minQuality" name="minQuality" type="number" min="0" max="5" step="0.5" class="form-control" value="@c.MinQuality" />
+            </div>
+            <div class="col-6 col-lg-1">
+                <label for="quantity" class="form-label">Quantity</label>
+                <input id="quantity" name="quantity" type="number" min="1" max="50" class="form-control" value="@c.Quantity" />
+            </div>
+            <div class="col-lg-2 d-flex align-items-end">
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="onlyAvailable" name="onlyAvailable" value="true" checked="@c.OnlyAvailable" />
+                    <input type="hidden" name="onlyAvailable" value="false" />
+                    <label class="form-check-label" for="onlyAvailable">Only available</label>
+                </div>
+            </div>
+            <div class="col-6 col-lg-2">
+                <label for="sortBy" class="form-label">Sort by</label>
+                <select id="sortBy" name="sortBy" class="form-select">
+                    <option value="price" selected="@(c.SortBy == "price")">Price</option>
+                    <option value="quality" selected="@(c.SortBy == "quality")">Quality</option>
+                    <option value="name" selected="@(c.SortBy == "name")">Name</option>
+                </select>
+            </div>
+            <div class="col-6 col-lg-2">
+                <label for="sortDir" class="form-label">Order</label>
+                <select id="sortDir" name="sortDir" class="form-select">
+                    <option value="asc" selected="@(c.SortDir == "asc")">Low to high / A–Z</option>
+                    <option value="desc" selected="@(c.SortDir == "desc")">High to low / Z–A</option>
+                </select>
+            </div>
+            <div class="col-lg-auto ms-auto d-flex align-items-end">
+                <button type="submit" class="btn btn-primary px-4 w-100">Search</button>
+            </div>
+        </div>
+    </form>
+
+    <section class="pt-4">
+        @if (Model.Rows.Any())
+        {
+            <p class="kt-muted">Showing page @c.Page of @Model.TotalPages (@Model.Total results)</p>
+            <div class="kt-table-wrap">
+                <table class="table kt-table">
+                    <thead>
+                        <tr><th>Type</th><th>Name</th><th>City</th><th>Quality</th><th class="kt-num">Price</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in Model.Rows)
+                        {
+                            <tr>
+                                <td><span class="kt-pill">@r.Type</span></td>
+                                <td><a href="@r.Url">@r.Name</a></td>
+                                <td>@r.City</td>
+                                <td class="@(r.QualityText.Contains('★') ? "kt-stars" : "")">@r.QualityText</td>
+                                <td class="kt-num">@(r.Price == 0 ? "Free" : Money.Vnd(r.Price)) <span class="small kt-muted">/ @r.PriceUnit</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="Result pages" class="mt-3">
+                    <ul class="pagination">
+                        <li class="page-item @(c.Page <= 1 ? "disabled" : "")"><a class="page-link" href="@PageUrl(c.Page - 1)">« Previous</a></li>
+                        @for (int p = 1; p <= Model.TotalPages; p++)
+                        {
+                            <li class="page-item @(p == c.Page ? "active" : "")"><a class="page-link" href="@PageUrl(p)">@p</a></li>
+                        }
+                        <li class="page-item @(c.Page >= Model.TotalPages ? "disabled" : "")"><a class="page-link" href="@PageUrl(c.Page + 1)">Next »</a></li>
+                    </ul>
+                </nav>
+            }
+        }
+        else
+        {
+            <div class="kt-empty">
+                <span class="kt-empty-icon" aria-hidden="true">🔍</span>
+                Nothing matches. Remove the keyword or choose more types.
+            </div>
+        }
+    </section>
+</div>
