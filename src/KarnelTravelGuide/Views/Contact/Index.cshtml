@@ -53,8 +53,10 @@
                             <span asp-validation-for="Booking.ServiceType"></span>
                         </div>
                         <div class="col-12">
-                            <label asp-for="Booking.ServiceId" class="form-label kt-req"></label>
-                            <select asp-for="Booking.ServiceId" class="form-select" id="serviceId">
+                            <label for="serviceId" class="form-label kt-req">Service</label>
+                            @* Plain select (no asp-for): ids repeat across types, so the selected option is chosen by type + id here *@
+                            <select name="Booking.ServiceId" class="form-select" id="serviceId"
+                                    data-val="true" data-val-range="Please choose a service." data-val-range-min="1" data-val-range-max="2147483647">
                                 <option value="0">Choose a service type first</option>
                                 @foreach (var s in Model.Services)
                                 {
