@@ -1,0 +1,193 @@
+@inject Microsoft.Extensions.Configuration.IConfiguration Config
+@model ContactViewModel
+@{
+    // Contact Us: booking form, feedback form and company details (CRS FR-50 to FR-54)
+    ViewData["Title"] = "Contact Us";
+    ViewData["Menu"] = "Contact";
+    var b = Model.Booking;
+    var today = DateTime.Today.ToString("yyyy-MM-dd");
+}
+
+<div class="kt-page-head">
+    <div class="container">
+        <h1>Contact Us</h1>
+        <p class="kt-muted mb-0">Send us a booking request or tell us what you think. We reply within 24 hours.</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row g-4 kt-section">
+        <div class="col-lg-8">
+            @* ===== Booking form (Algorithm A5) ===== *@
+            <section class="kt-panel" id="booking" aria-labelledby="bookingTitle">
+                <h2 id="bookingTitle">Book a service</h2>
+                <p class="kt-muted">Fields marked <span class="text-danger">*</span> are required.</p>
+
+                <form asp-action="Book" method="post" novalidate>
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="Booking.FullName" class="form-label kt-req"></label>
+                            <input asp-for="Booking.FullName" class="form-control" placeholder="Nguyen Van An" autocomplete="name" />
+                            <span asp-validation-for="Booking.FullName"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Booking.Email" class="form-label kt-req"></label>
+                            <input asp-for="Booking.Email" class="form-control" placeholder="an.nguyen@example.com" autocomplete="email" />
+                            <span asp-validation-for="Booking.Email"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Booking.Phone" class="form-label kt-req"></label>
+                            <input asp-for="Booking.Phone" class="form-control" placeholder="0912345678" inputmode="numeric" autocomplete="tel" />
+                            <span asp-validation-for="Booking.Phone"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Booking.ServiceType" class="form-label kt-req"></label>
+                            <select asp-for="Booking.ServiceType" class="form-select" id="serviceType">
+                                <option value="">Choose…</option>
+                                @foreach (var t in Booking.ServiceTypes)
+                                {
+                                    <option value="@t">@t</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Booking.ServiceType"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Booking.ServiceId" class="form-label kt-req"></label>
+                            <select asp-for="Booking.ServiceId" class="form-select" id="serviceId">
+                                <option value="0">Choose a service type first</option>
+                                @foreach (var s in Model.Services)
+                                {
+                                    <option value="@s.Id" data-type="@s.Type" selected="@(s.Type == b.ServiceType && s.Id == b.ServiceId)">@s.Label</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Booking.ServiceId"></span>
+                        </div>
+                        <div class="col-sm-4">
+                            <label asp-for="Booking.TravelDate" class="form-label kt-req"></label>
+                            <input asp-for="Booking.TravelDate" type="date" min="@today" class="form-control" />
+                            <span asp-validation-for="Booking.TravelDate"></span>
+                        </div>
+                        <div class="col-6 col-sm-4">
+                            <label asp-for="Booking.NumberOfPeople" class="form-label kt-req"></label>
+                            <input asp-for="Booking.NumberOfPeople" type="number" min="1" max="50" class="form-control" />
+                            <span asp-validation-for="Booking.NumberOfPeople"></span>
+                        </div>
+                        <div class="col-6 col-sm-4">
+                            <label asp-for="Booking.Quantity" class="form-label kt-req"></label>
+                            <input asp-for="Booking.Quantity" type="number" min="1" max="50" class="form-control" />
+                            <span asp-validation-for="Booking.Quantity"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Booking.Note" class="form-label"></label>
+                            <textarea asp-for="Booking.Note" rows="3" class="form-control" placeholder="Room with a view, pick-up time, dietary needs…"></textarea>
+                            <span asp-validation-for="Booking.Note"></span>
+                        </div>
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-primary px-4">Send booking</button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+
+            @* ===== Feedback form (Algorithm A6) ===== *@
+            <section class="kt-panel mt-4" id="feedback" aria-labelledby="feedbackTitle">
+                <h2 id="feedbackTitle">Feedback</h2>
+                <p class="kt-muted">Tell us about your trip or about this website.</p>
+
+                <form asp-action="Feedback" method="post" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="Feedback.FullName" class="form-label kt-req"></label>
+                            <input asp-for="Feedback.FullName" class="form-control" autocomplete="name" />
+                            <span asp-validation-for="Feedback.FullName"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Feedback.Email" class="form-label kt-req"></label>
+                            <input asp-for="Feedback.Email" class="form-control" autocomplete="email" />
+                            <span asp-validation-for="Feedback.Email"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Feedback.Phone" class="form-label kt-req"></label>
+                            <input asp-for="Feedback.Phone" class="form-control" inputmode="numeric" autocomplete="tel" />
+                            <span asp-validation-for="Feedback.Phone"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="form-label d-block kt-req">Rating</span>
+                            @* Stars are radio buttons; row-reverse in CSS makes hovering light up the stars to the left *@
+                            <div class="kt-rating" role="radiogroup" aria-label="Rating">
+                                @for (int i = 5; i >= 1; i--)
+                                {
+                                    <input type="radio" id="rating@(i)" name="Feedback.Rating" value="@i" checked="@(Model.Feedback.Rating == i)"
+                                           data-val="true" data-val-range="Please choose a rating from 1 to 5 stars." data-val-range-min="1" data-val-range-max="5"
+                                           data-val-required="Please choose a rating from 1 to 5 stars." />
+                                    <label for="rating@(i)" title="@i star@(i > 1 ? "s" : "")">★</label>
+                                }
+                            </div>
+                            <span asp-validation-for="Feedback.Rating"></span>
+                        </div>
+                        <div class="col-md-8">
+                            <label asp-for="Feedback.Subject" class="form-label"></label>
+                            <input asp-for="Feedback.Subject" class="form-control" placeholder="e.g. Ha Long cruise in December" />
+                            <span asp-validation-for="Feedback.Subject"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Feedback.Message" class="form-label kt-req"></label>
+                            <textarea asp-for="Feedback.Message" rows="4" class="form-control"></textarea>
+                            <span asp-validation-for="Feedback.Message"></span>
+                        </div>
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-outline-primary px-4">Send feedback</button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+        </div>
+
+        @* ===== Company contact details ===== *@
+        <aside class="col-lg-4">
+            <div class="kt-panel">
+                <h2 class="h3">Karnel Travels</h2>
+                <dl class="kt-facts">
+                    <dt>Address</dt><dd>@Config["Company:Address"]</dd>
+                    <dt>Hotline</dt><dd>@Config["Company:Hotline"]</dd>
+                    <dt>Email</dt><dd>@Config["Company:Email"]</dd>
+                    <dt>Open</dt><dd>@Config["Company:OpeningHours"]</dd>
+                </dl>
+                <p class="kt-muted small mt-3 mb-0">Bookings are requests, not payments. Our staff call you to confirm prices and availability before anything is charged.</p>
+            </div>
+        </aside>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScripts" />
+    <script>
+        // Show only the services of the chosen type in the "Service" list
+        (function () {
+            var typeSel = document.getElementById("serviceType");
+            var svcSel = document.getElementById("serviceId");
+            function filter(keepSelection) {
+                var type = typeSel.value;
+                var first = svcSel.options[0];
+                first.text = type ? "Choose a " + type.toLowerCase() : "Choose a service type first";
+                for (var i = 1; i < svcSel.options.length; i++) {
+                    var o = svcSel.options[i];
+                    var match = o.getAttribute("data-type") === type;
+                    o.hidden = !match;
+                    o.disabled = !match;
+                    if (!match && o.selected) o.selected = false;
+                }
+                if (!keepSelection) svcSel.value = "0";
+            }
+            typeSel.addEventListener("change", function () { filter(false); });
+            filter(true);
+
+            // After a feedback error, bring the feedback form into view
+            @if (Model.OpenTab == "feedback")
+            {
+                <text>document.getElementById("feedback").scrollIntoView();</text>
+            }
+        })();
+    </script>
+}
