@@ -1,0 +1,69 @@
+@model AboutViewModel
+@{
+    ViewData["Title"] = "About Us";
+    ViewData["Menu"] = "About";
+}
+
+<div class="kt-page-head">
+    <div class="container">
+        <h1>About Karnel Travels</h1>
+        <p class="kt-muted mb-0">A Tours and Travels company connecting travellers with the best of Viet Nam.</p>
+    </div>
+</div>
+
+<div class="container">
+    @* ===== Company details (CRS FR-20) ===== *@
+    <section class="kt-section">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-7">
+                <h2>Who we are</h2>
+                <p>Karnel Travels plans trips across Viet Nam, from the limestone islands of Ha Long Bay to the beaches of Phu Quoc. We move travellers between cities and tourist spots, arrange places to stay, and put together tour packages that combine both.</p>
+                <p>This website brings all of that into one place. You can read about tourist spots, compare hotels, restaurants and resorts, check transport routes and fares, and send us a booking request. Our staff call you back to confirm every booking.</p>
+            </div>
+            <div class="col-lg-5">
+                <img class="kt-img kt-detail-img" src="/images/spots/hoi-an-ancient-town.jpg" alt="Hoi An ancient town at night" />
+            </div>
+        </div>
+    </section>
+
+    @* ===== Facilities provided (CRS FR-21) ===== *@
+    <section class="kt-section">
+        <h2>Our facilities</h2>
+        <div class="row g-4 mt-1">
+            <div class="col-md-4">
+                <div class="kt-tile">
+                    <span class="kt-tile-icon" aria-hidden="true">🚌</span>
+                    <h3>Transportation</h3>
+                    <p>Limousine vans, private cars with drivers, and booking of trains and flights between cities in the country.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="kt-tile">
+                    <span class="kt-tile-icon" aria-hidden="true">🧭</span>
+                    <h3>Packages</h3>
+                    <p>Tours of 2 to 4 days that bundle transport, accommodation and visits to tourist spots, with seasonal discounts.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="kt-tile">
+                    <span class="kt-tile-icon" aria-hidden="true">🏝️</span>
+                    <h3>Transport and accommodation at tourist locations</h3>
+                    <p>We take you to the destination and book your hotel or resort there, so the whole trip is arranged in one call.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @* ===== Numbers from the database ===== *@
+    <section class="kt-section">
+        <h2>Karnel in numbers</h2>
+        <div class="kt-stats mt-3">
+            <div class="kt-stat"><b>@Model.Destinations</b><span>destinations</span></div>
+            <div class="kt-stat"><b>@Model.Hotels</b><span>partner hotels</span></div>
+            <div class="kt-stat"><b>@Model.Resorts</b><span>resorts</span></div>
+            <div class="kt-stat"><b>@Model.Routes</b><span>transport routes</span></div>
+            <div class="kt-stat"><b>@Model.Packages</b><span>active packages</span></div>
+        </div>
+        <p class="mt-4"><a class="btn btn-primary" asp-controller="Contact" asp-action="Index">Contact us to plan your trip</a></p>
+    </section>
+</div>

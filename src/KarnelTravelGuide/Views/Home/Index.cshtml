@@ -1,6 +1,104 @@
+@model HomeViewModel
 @{
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = "Discover Viet Nam";
+    ViewData["Menu"] = "Home";
 }
-@* T14 check page: shows row counts read from KarnelTravelDB *@
-<h1>Karnel Travel Guide</h1>
-<p>Database connected: @ViewBag.Locations locations, @ViewBag.Spots tourist spots, @ViewBag.Hotels hotels.</p>
+
+@* ===== Hero with quick search (goes to the Search page) ===== *@
+<section class="kt-hero">
+    <div class="container">
+        <h1>Discover Viet Nam with Karnel Travels</h1>
+        <p>Transport between cities, tour packages and places to stay at the country's best beaches, mountains and heritage towns.</p>
+
+        <form class="kt-hero-search" method="get" asp-controller="Search" asp-action="Index">
+            <div class="row g-2 align-items-end">
+                <div class="col-sm-5">
+                    <label for="heroLocation" class="form-label">Where to?</label>
+                    <select id="heroLocation" name="locationId" class="form-select">
+                        <option value="">Anywhere in Viet Nam</option>
+                        @foreach (var l in Model.Locations)
+                        {
+                            <option value="@l.LocationId">@l.City</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-sm-4">
+                    <label for="heroType" class="form-label">Looking for</label>
+                    <select id="heroType" name="type" class="form-select">
+                        <option value="Spot">Tourist spots</option>
+                        <option value="Hotel" selected>Hotels</option>
+                        <option value="Restaurant">Restaurants</option>
+                        <option value="Resort">Resorts</option>
+                    </select>
+                </div>
+                <div class="col-sm-3 d-grid">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<div class="container">
+    @* ===== Featured destinations ===== *@
+    <section class="kt-section">
+        <div class="kt-section-head">
+            <h2>Featured destinations</h2>
+            <a asp-controller="Information" asp-action="TouristSpots">See all tourist spots →</a>
+        </div>
+        <div class="row g-4">
+            @foreach (var card in Model.FeaturedSpots)
+            {
+                <div class="col-sm-6 col-lg-3"><partial name="_PlaceCard" model="card" /></div>
+            }
+        </div>
+    </section>
+
+    @* ===== Packages and discounts ===== *@
+    @if (Model.Packages.Any())
+    {
+        <section class="kt-section">
+            <div class="kt-section-head">
+                <h2>Packages and discounts</h2>
+                <a asp-controller="Information" asp-action="Index">All offers →</a>
+            </div>
+            <div class="row g-4">
+                @foreach (var card in Model.Packages)
+                {
+                    <div class="col-md-4"><partial name="_PlaceCard" model="card" /></div>
+                }
+            </div>
+        </section>
+    }
+
+    @* ===== Services summary (links to About Us) ===== *@
+    <section class="kt-section">
+        <div class="kt-section-head">
+            <h2>What we do</h2>
+            <a href="/About">About Karnel Travels →</a>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <a class="kt-tile" asp-controller="Information" asp-action="Travel">
+                    <span class="kt-tile-icon" aria-hidden="true">🚌</span>
+                    <h3>Transportation</h3>
+                    <p>Limousines, private cars, trains and flights between cities and tourist spots.</p>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a class="kt-tile" asp-controller="Information" asp-action="Index">
+                    <span class="kt-tile-icon" aria-hidden="true">🧭</span>
+                    <h3>Tour packages</h3>
+                    <p>Ready-made trips with transport, stays and visits, often at a discount.</p>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a class="kt-tile" asp-controller="Information" asp-action="Hotels">
+                    <span class="kt-tile-icon" aria-hidden="true">🏨</span>
+                    <h3>Accommodation</h3>
+                    <p>Hotels and resorts near every destination, from budget rooms to beach villas.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+</div>

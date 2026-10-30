@@ -1,5 +1,12 @@
 @{
     ViewData["Title"] = "Page not found";
 }
-<h1>Page not found</h1>
-<p>The page you asked for does not exist. Go back to the <a href="/">Home Page</a>.</p>
+@* Friendly page for 404 and other status codes *@
+<div class="container kt-section">
+    <div class="kt-empty">
+        <span class="kt-empty-icon" aria-hidden="true">🧭</span>
+        <h1 class="h3">We could not find that page</h1>
+        <p>The address may be mistyped, or the item may have been removed.</p>
+        <a class="btn btn-primary" href="/">Back to the Home Page</a>
+    </div>
+</div>
