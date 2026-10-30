@@ -14,6 +14,7 @@ Built with **ASP.NET Core MVC 8 (C#)**, **Entity Framework Core** and **Microsof
 | `Docs/Design` | ERD, database design, algorithms, GUI standards, interface design |
 | `Docs/Testing` | Unit testing checklist |
 | `Docs/Reports` | Status reports, review report, final checklist, setup guide |
+| `scripts` | Windows hosts-file script for www.karneltravelguide.com |
 | `Database` | SQL Server scripts: schema, then sample data |
 | `src/KarnelTravelGuide` | The website source code |
 
