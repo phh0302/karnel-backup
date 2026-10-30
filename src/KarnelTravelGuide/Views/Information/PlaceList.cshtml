@@ -1,0 +1,71 @@
+@model PlaceListViewModel
+@{
+    // Shared list page for Tourist Spots, Hotels, Restaurants and Resorts (CRS FR-43, FR-45 to FR-47)
+    ViewData["Title"] = Model.Title;
+    ViewData["Menu"] = "Information";
+}
+
+<div class="kt-page-head">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="Index">Information</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+            </ol>
+        </nav>
+        <h1>@Model.Title</h1>
+        <p class="kt-muted mb-0">@Model.Intro</p>
+    </div>
+</div>
+
+<div class="container">
+    @* ===== Filter by city (and category for tourist spots) ===== *@
+    <form method="get" asp-action="@Model.Action" class="row g-2 align-items-end kt-section pt-4">
+        <div class="col-sm-5 col-md-4">
+            <label for="locationId" class="form-label">City</label>
+            <select id="locationId" name="locationId" class="form-select">
+                <option value="">All cities</option>
+                @foreach (var l in Model.Locations)
+                {
+                    <option value="@l.LocationId" selected="@(Model.LocationId == l.LocationId)">@l.City</option>
+                }
+            </select>
+        </div>
+        @if (Model.Categories != null)
+        {
+            <div class="col-sm-4 col-md-3">
+                <label for="category" class="form-label">Type</label>
+                <select id="category" name="category" class="form-select">
+                    <option value="">All types</option>
+                    @foreach (var c in Model.Categories)
+                    {
+                        <option value="@c" selected="@(Model.Category == c)">@c</option>
+                    }
+                </select>
+            </div>
+        }
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Show</button>
+        </div>
+        <div class="col-auto ms-auto kt-muted">@Model.Cards.Count found</div>
+    </form>
+
+    <section class="pt-4">
+        @if (Model.Cards.Any())
+        {
+            <div class="row g-4">
+                @foreach (var card in Model.Cards)
+                {
+                    <div class="col-sm-6 col-lg-4 col-xl-3"><partial name="_PlaceCard" model="card" /></div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="kt-empty">
+                <span class="kt-empty-icon" aria-hidden="true">🔍</span>
+                Nothing here for this city yet. Choose "All cities" to see everything.
+            </div>
+        }
+    </section>
+</div>

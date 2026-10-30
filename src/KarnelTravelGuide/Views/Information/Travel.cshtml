@@ -1,0 +1,108 @@
+@model TravelViewModel
+@{
+    // Travel Information: transport facilities between cities (CRS FR-44)
+    ViewData["Title"] = "Travel Information";
+    ViewData["Menu"] = "Information";
+}
+
+<div class="kt-page-head">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="Index">Information</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Travel Information</li>
+            </ol>
+        </nav>
+        <h1>Travel Information</h1>
+        <p class="kt-muted mb-0">Buses, trains, cars and flights between cities and tourist spots. Fares are per person unless the note says per car.</p>
+    </div>
+</div>
+
+<div class="container">
+    <form method="get" asp-action="Travel" class="row g-2 align-items-end pt-4">
+        <div class="col-sm-4 col-md-3">
+            <label for="fromId" class="form-label">From</label>
+            <select id="fromId" name="fromId" class="form-select">
+                <option value="">Any city</option>
+                @foreach (var l in Model.Locations)
+                {
+                    <option value="@l.LocationId" selected="@(Model.FromId == l.LocationId)">@l.City</option>
+                }
+            </select>
+        </div>
+        <div class="col-sm-4 col-md-3">
+            <label for="toId" class="form-label">To</label>
+            <select id="toId" name="toId" class="form-select">
+                <option value="">Any city</option>
+                @foreach (var l in Model.Locations)
+                {
+                    <option value="@l.LocationId" selected="@(Model.ToId == l.LocationId)">@l.City</option>
+                }
+            </select>
+        </div>
+        <div class="col-sm-4 col-md-2">
+            <label for="type" class="form-label">Type</label>
+            <select id="type" name="type" class="form-select">
+                <option value="">All</option>
+                @foreach (var t in Transport.Types)
+                {
+                    <option value="@t" selected="@(Model.Type == t)">@t</option>
+                }
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Show routes</button>
+        </div>
+    </form>
+
+    <section class="pt-4">
+        @if (Model.Routes.Any())
+        {
+            <div class="kt-table-wrap">
+                <table class="table kt-table">
+                    <thead>
+                        <tr>
+                            <th>From</th><th>To</th><th>Type</th><th>Operator</th>
+                            <th class="kt-num">Fare</th><th class="kt-num">Duration</th><th>Departures</th><th>Seats</th><th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in Model.Routes)
+                        {
+                            <tr>
+                                <td>@r.FromLocation?.City</td>
+                                <td>@r.ToLocation?.City</td>
+                                <td><span class="kt-pill">@r.TransportType</span></td>
+                                <td>
+                                    @r.Operator
+                                    @if (!string.IsNullOrEmpty(r.Description))
+                                    {
+                                        <div class="small kt-muted">@r.Description</div>
+                                    }
+                                </td>
+                                <td class="kt-num">@Money.Vnd(r.Fare)</td>
+                                <td class="kt-num">@r.DurationHours.ToString("0.#") h</td>
+                                <td class="small">@r.DepartureTimes</td>
+                                <td>@(r.SeatsAvailable > 0 ? r.SeatsAvailable.ToString() : "Full")</td>
+                                <td>
+                                    @if (r.SeatsAvailable > 0)
+                                    {
+                                        <a class="btn btn-sm btn-outline-primary" asp-controller="Contact" asp-action="Index"
+                                           asp-route-serviceType="Transport" asp-route-serviceId="@r.TransportId">Book</a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="kt-empty">
+                <span class="kt-empty-icon" aria-hidden="true">🚌</span>
+                No route matches. Try "Any city" for one of the ends, or call us for a private car.
+            </div>
+        }
+    </section>
+</div>

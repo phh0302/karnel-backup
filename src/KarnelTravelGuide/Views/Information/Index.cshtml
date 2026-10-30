@@ -1,0 +1,103 @@
+@model InformationIndexViewModel
+@{
+    ViewData["Title"] = "Information";
+    ViewData["Menu"] = "Information";
+}
+
+<div class="kt-page-head">
+    <div class="container">
+        <h1>Information</h1>
+        <p class="kt-muted mb-0">Everything you need to plan a trip in Viet Nam, in five sections.</p>
+    </div>
+</div>
+
+<div class="container">
+    @* ===== The five links required by the client (CRS FR-40) ===== *@
+    <section class="kt-section">
+        <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-lg-5">
+            <div class="col">
+                <a class="kt-tile" asp-action="TouristSpots">
+                    <span class="kt-tile-icon" aria-hidden="true">🏖️</span>
+                    <h3>Tourist Spots</h3>
+                    <p>@Model.SpotCount places to visit</p>
+                </a>
+            </div>
+            <div class="col">
+                <a class="kt-tile" asp-action="Travel">
+                    <span class="kt-tile-icon" aria-hidden="true">🚆</span>
+                    <h3>Travel Information</h3>
+                    <p>@Model.RouteCount transport routes</p>
+                </a>
+            </div>
+            <div class="col">
+                <a class="kt-tile" asp-action="Hotels">
+                    <span class="kt-tile-icon" aria-hidden="true">🏨</span>
+                    <h3>Hotel Information</h3>
+                    <p>@Model.HotelCount hotels</p>
+                </a>
+            </div>
+            <div class="col">
+                <a class="kt-tile" asp-action="Restaurants">
+                    <span class="kt-tile-icon" aria-hidden="true">🍜</span>
+                    <h3>Restaurant Information</h3>
+                    <p>@Model.RestaurantCount restaurants</p>
+                </a>
+            </div>
+            <div class="col">
+                <a class="kt-tile" asp-action="Resorts">
+                    <span class="kt-tile-icon" aria-hidden="true">🌴</span>
+                    <h3>Resorts Information</h3>
+                    <p>@Model.ResortCount resorts</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    @* ===== Packages and discounts (CRS FR-42) ===== *@
+    <section class="kt-section">
+        <div class="kt-section-head"><h2>Packages and discounts</h2></div>
+        @if (Model.Packages.Any())
+        {
+            <div class="row g-4">
+                @foreach (var card in Model.Packages)
+                {
+                    <div class="col-sm-6 col-lg-4"><partial name="_PlaceCard" model="card" /></div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="kt-empty">No packages are running right now. Check back soon.</div>
+        }
+    </section>
+
+    @* ===== New hotels, restaurants and resorts (CRS FR-41) ===== *@
+    <section class="kt-section">
+        <div class="kt-section-head"><h2>New on Karnel</h2></div>
+        @{
+            var groups = new (string Title, List<PlaceCard> Cards)[]
+            {
+                ("New hotels", Model.NewHotels),
+                ("New restaurants", Model.NewRestaurants),
+                ("New resorts", Model.NewResorts)
+            };
+        }
+        @foreach (var g in groups)
+        {
+            <h3 class="mt-4">@g.Title</h3>
+            @if (g.Cards.Any())
+            {
+                <div class="row g-4 mt-0">
+                    @foreach (var card in g.Cards)
+                    {
+                        <div class="col-sm-6 col-lg-3"><partial name="_PlaceCard" model="card" /></div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="kt-muted">Nothing new this month.</p>
+            }
+        }
+    </section>
+</div>
