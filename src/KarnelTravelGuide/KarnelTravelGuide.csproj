@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- Karnel Travel Guide website: ASP.NET Core MVC on .NET 8 -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>KarnelTravelGuide</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Entity Framework Core for SQL Server: data access to KarnelTravelDB -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
+    <!-- PasswordHasher<T> used to check admin passwords (PBKDF2) -->
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="8.0.11" />
+  </ItemGroup>
+
+</Project>
