@@ -17,7 +17,9 @@ $hosts   = "$env:SystemRoot\System32\drivers\etc\hosts"
 $entries = @("127.0.0.1 www.karneltravelguide.com", "127.0.0.1 karneltravelguide.com")
 
 # Read the current file and drop any old Karnel lines so the script can run twice safely
-$lines = Get-Content $hosts | Where-Object { $_ -notmatch "karneltravelguide\.com" }
+# @( ) keeps $lines an array even when the file is empty or has one line;
+# without it, += would glue the new entries onto one line and Windows would ignore them
+$lines = @(Get-Content $hosts | Where-Object { $_ -notmatch "karneltravelguide\.com" })
 
 if (-not $Remove) {
     $lines += "# Karnel Travel Guide (eProject)"
