@@ -47,6 +47,8 @@ Open http://localhost:5080. In Visual Studio, open `KarnelTravelGuide.sln`, choo
    `dotnet run --launch-profile karneltravelguide.com` (run the terminal as Administrator if port 80 is refused).
 3. Open http://www.karneltravelguide.com.
 
+If the script cannot write the file, add the lines by hand: open Notepad **as Administrator**, open `C:\Windows\System32\drivers\etc\hosts` (choose *All files*), add `127.0.0.1 www.karneltravelguide.com` and `127.0.0.1 karneltravelguide.com` at the end, and save.
+
 To undo step 1: `powershell -ExecutionPolicy Bypass -File scripts\setup-hosts.ps1 -Remove`.
 
 ## 6. Photos
