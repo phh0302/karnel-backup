@@ -23,11 +23,11 @@ Edit `src/KarnelTravelGuide/appsettings.json`:
 
 ```json
 "ConnectionStrings": {
-  "KarnelDb": "Server=localhost;Database=KarnelTravelDB;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True"
+  "KarnelDb": "Server=(localdb)\\MSSQLLocalDB;Database=KarnelTravelDB;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True"
 }
 ```
 
-If you installed SQL Server Express, use `Server=.\\SQLEXPRESS` instead of `Server=localhost`.
+The default is SQL Server LocalDB, which comes with Visual Studio. Use the server name shown at the top of SSMS Object Explorer: `Server=localhost` for a full SQL Server, `Server=.\\SQLEXPRESS` for SQL Server Express. In JSON every `\` is written twice.
 
 ## 4. Run the website
 
