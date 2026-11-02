@@ -6,6 +6,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>KarnelTravelGuide</RootNamespace>
+    <!-- Run on a newer .NET runtime (e.g. .NET 10) when the .NET 8 runtime is not installed -->
+    <RollForward>Major</RollForward>
   </PropertyGroup>
 
   <ItemGroup>
