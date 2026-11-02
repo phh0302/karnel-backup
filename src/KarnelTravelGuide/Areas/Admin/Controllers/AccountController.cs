@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+// Inside the Areas.Admin namespace the word "Admin" means the namespace, so give the entity another name here
+using AdminUser = KarnelTravelGuide.Models.Entities.Admin;
 
 namespace KarnelTravelGuide.Areas.Admin.Controllers;
 
@@ -19,9 +21,9 @@ namespace KarnelTravelGuide.Areas.Admin.Controllers;
 public class AccountController : Controller
 {
     private readonly KarnelDbContext _db;
-    private readonly IPasswordHasher<Admin> _hasher;
+    private readonly IPasswordHasher<AdminUser> _hasher;
 
-    public AccountController(KarnelDbContext db, IPasswordHasher<Admin> hasher)
+    public AccountController(KarnelDbContext db, IPasswordHasher<AdminUser> hasher)
     {
         _db = db;
         _hasher = hasher;
